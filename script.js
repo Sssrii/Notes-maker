@@ -1,35 +1,43 @@
-// const notescontainer=document.querySelector(".notes-container");
-// const createBtn=document.querySelector(".button");
-// let notes= document.querySelectorAll(".input-box");
-
-// createBtn.addEventListener("click", ()=>{
-//     let inputBox=document.createElement("p");
-//     let img=document.createElement("img");
-//     inputBox.className="input-box";
-//     inputBox.setAttribute("contenteditable", "true");
-//     img.src="delete.png";
-//     notescontainer.appendChild(inputBox).appendChild(img)
-// })
-
 const notescontainer = document.querySelector(".notes-container");
-const createBtn = document.querySelector("button"); // Fixed selection
-let notes = document.querySelectorAll(".input-box");
+const createBtn = document.querySelector("button"); 
 
-createBtn.addEventListener("click", () => {
+// Function to save notes to Local Storage
+function saveNotes() {
+    const notes = Array.from(document.querySelectorAll(".input-box")).map(note => note.innerText);
+    localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+// Function to load saved notes from Local Storage
+function loadNotes() {
+    const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+    savedNotes.forEach(noteText => createNote(noteText));
+}
+
+// Function to create a new note
+function createNote(text = "") {
     let inputBox = document.createElement("p");
     let img = document.createElement("img");
 
-    inputBox.className = "input-box"; // Fixed incorrect class name
+    inputBox.className = "input-box"; 
     inputBox.setAttribute("contenteditable", "true");
+    inputBox.innerText = text; // Load saved text
     img.src = "delete.png";
 
-    // Append the delete button inside the input box
     inputBox.appendChild(img);
     notescontainer.appendChild(inputBox);
 
-    // Add event listener to delete the note
-    img.addEventListener("click", () => {
+    inputBox.addEventListener("input", saveNotes); // Save on edit
+
+    img.addEventListener("click", function() {
         inputBox.remove();
+        saveNotes(); // Save after deletion
     });
+}
+
+// Add new note when button is clicked
+createBtn.addEventListener("click", function() {  
+    createNote(); // Call function to create a new note
 });
 
+// Load saved notes when the page loads
+loadNotes();
